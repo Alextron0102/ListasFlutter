@@ -1,43 +1,61 @@
 import 'package:flutter/material.dart';
 void main() => runApp(MaterialApp(
-  home: QuoteList(),
+  home: Lista(),
   )
 );
 
 class Dato{
   String _texto;
-  TimeOfDay _tiempo;
+  String _tiempo;
   int _posicion;
-  Dato(String texto, TimeOfDay tiempo, int posicion){
+  bool estado;
+  Dato(String texto, String tiempo, int posicion){
     _texto = texto;
     _tiempo= tiempo;
     _posicion = posicion;
+    estado= false;
   }
 }
 class ListaDatos {
   List<Dato> _lista = List<Dato>();
   int _contador=0;
   ListaDatos(){
-    _lista.add(Dato('EJEMPLO',TimeOfDay.now(),0));
+    for (var i = 0; i < 15; i++) {
+    agregar(Dato('EJEMPLO $i',DateTime.now().toString(), _contador));
+    }
   }
-  void agregar(String texto, TimeOfDay tiempo){
-    _lista.add(Dato(texto, tiempo, _contador));
+  void agregar(Dato dato){
+    dato._posicion = _contador;
+    _lista.add(dato);
+    _contador++;
   }
   void eliminar(int posicion){
     _lista.removeAt(posicion);
+    _contador--;
+    actualizarposiciones();
   }
-  void modificar(String texto, TimeOfDay tiempo, int posicion){
+  void actualizarposiciones(){
+    for (var i = 0; i < _contador-1; i++) {
+      if(_lista[i]._posicion!=_lista[i]._posicion+1){
+        for (var j = i; j < _contador; j++) {
+          _lista[i]._posicion = j;
+        }
+        break;
+      }
+    }
+  }
+  void modificar(String texto, String tiempo, int posicion){
     _lista[posicion] = Dato(texto, tiempo, posicion);
   }
   Dato getDato(int posicion){
     return _lista[posicion];
   }
 }
-class QuoteList extends StatefulWidget {
+class Lista extends StatefulWidget {
   @override
-  _QuoteListState createState() => _QuoteListState();
+  _ListaState createState() => _ListaState();
 }
-class _QuoteListState extends State<QuoteList> {
+class _ListaState extends State<Lista> {
   ListaDatos dato = new ListaDatos();
   Widget datoCarta(Dato _dato){
     return Card(
@@ -47,12 +65,21 @@ class _QuoteListState extends State<QuoteList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(
-              _dato._texto,
-              style: TextStyle(
-                fontSize: 18.0,
-                color: Colors.grey[600],
+            
+            CheckboxListTile(
+              title: Text(
+                _dato._texto,
+                style: TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.grey[600],
+                ),
               ),
+              value: _dato.estado,
+              onChanged: (bool value){
+                setState(() {
+                  _dato.estado = value;
+                });
+              },
             ),
             SizedBox(height: 6.0),
             Text(
@@ -70,22 +97,24 @@ class _QuoteListState extends State<QuoteList> {
    @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.grey,
       appBar: AppBar(
         title: Text('Lista de datos'),
         centerTitle: true,
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.grey[900],
       ),
       body: ListView(
          children: dato._lista.map((dato)=>datoCarta(dato)).toList(),  
       ),
     floatingActionButton: FloatingActionButton(
-      onPressed: (){
-        Navigator.push(context, 
-        MaterialPageRoute(builder: (context)=>IngresoDatos()));
+      onPressed: ()async {
+        final datoUnico = await Navigator.push(context, 
+        MaterialPageRoute(builder: (context)=>IngresoDatos())
+        ) as Dato;
+        dato.agregar(datoUnico);
       },
       child: Icon(Icons.add),
-      backgroundColor: Colors.red[600],
+      backgroundColor: Colors.grey[600],
     )
     );
   }
@@ -95,6 +124,8 @@ class IngresoDatos extends StatefulWidget {
   _IngresoDatosState createState() => _IngresoDatosState();
 }
 class _IngresoDatosState extends State<IngresoDatos> {
+  final TextoDato = TextEditingController();
+  final TextoFecha = TextEditingController(text: DateTime.now().toString());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,8 +145,10 @@ class _IngresoDatosState extends State<IngresoDatos> {
             )
         ),
         Container(
+
           padding: EdgeInsets.all(30.0),
           child:   TextField(
+            controller: TextoDato,
             autocorrect: false,
           maxLines: 3,
           maxLength: 50,
@@ -128,7 +161,6 @@ class _IngresoDatosState extends State<IngresoDatos> {
             filled: true,
             contentPadding:
           EdgeInsets.only(bottom: 10.0, left: 10.0, right: 10.0),
-          // border: InputBorder.none,
           hintText: '...'
           ),
         ),
@@ -140,9 +172,10 @@ class _IngresoDatosState extends State<IngresoDatos> {
         Container(
           padding: EdgeInsets.all(30.0),
           child:   TextField(
+            controller: TextoFecha,
             autocorrect: false,
           maxLines: 1,
-          maxLength: 10,
+          maxLength: 26,
           textAlign: TextAlign.center,
           decoration: InputDecoration(
           focusedBorder: OutlineInputBorder(
@@ -162,8 +195,7 @@ class _IngresoDatosState extends State<IngresoDatos> {
     floatingActionButton: FloatingActionButton(
       onPressed: (){
         setState(() {
-
-          Navigator.pop(context,);
+          Navigator.pop(context,Dato(TextoDato.text, TextoFecha.text,0));
         });
       },
       child: Icon(Icons.add),
