@@ -19,6 +19,7 @@ class ListaDatos {
   void eliminarSeleccionados() {
     for (var i = 0; i < _contador; i++) {
         if (_lista[i].getEstado() == true) {
+        _lista[i].setEstado(false);
         _lista.removeAt(i);
         _contador--;
         i=0;
