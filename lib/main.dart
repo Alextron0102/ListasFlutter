@@ -3,7 +3,6 @@ import 'package:flutter/rendering.dart';
 import 'package:segundaapp/ListaDatos.dart';
 import 'package:segundaapp/Dato.dart';
 import 'package:segundaapp/IngresoDatos.dart';
-
 void main() => runApp(MaterialApp(
       home: Lista(),
     ));
@@ -33,6 +32,7 @@ class _ListaState extends State<Lista> {
       estadoEliminarBoton();
     }
   }
+
   void estadoAgregarBoton() {
     _boton = Icon(Icons.add);
     funcionBoton = (BuildContext context, ListaDatos dato) async {
@@ -48,8 +48,10 @@ class _ListaState extends State<Lista> {
   void estadoEliminarBoton() {
     _boton = Icon(Icons.delete);
     funcionBoton = (BuildContext context, ListaDatos dato) async {
-      dato.eliminarSeleccionados();
-      dato.getlista().map((dato) => datoCarta(dato)).toList();
+      setState(() {
+        dato.eliminarSeleccionados();
+        dato.getlista().map((dato) => datoCarta(dato)).toList();
+      });
     };
     _colorboton = Color(Colors.red[600].value);
   }

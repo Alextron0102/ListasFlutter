@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:segundaapp/Dato.dart';
+import 'package:intl/intl.dart';
 class IngresoDatos extends StatefulWidget {
   @override
   _IngresoDatosState createState() => _IngresoDatosState();
 }
 class _IngresoDatosState extends State<IngresoDatos> {
   final textoDato = TextEditingController();
-  final textoFecha = TextEditingController(text: DateTime.now().toString());
+  final textoFecha = TextEditingController(text: DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now()));
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +40,7 @@ class _IngresoDatosState extends State<IngresoDatos> {
                   filled: true,
                   contentPadding:
                       EdgeInsets.only(bottom: 10.0, left: 10.0, right: 10.0),
-                  hintText: '...'),
+                  hintText: 'texto de ejemplo'),
             ),
           ),
           Container(alignment: Alignment.center, child: Text('Fecha: ')),
